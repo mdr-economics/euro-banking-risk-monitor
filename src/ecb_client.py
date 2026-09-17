@@ -2,8 +2,12 @@ import io
 import requests
 import pandas as pd
 
+from tenacity import retry, stop_after_attempt, wait_exponential
+
+
 BASE_URL = "https://data-api.ecb.europa.eu/service/data"
 
+@retry(stop=stop_after_attempt(4), wait=wait_exponential(multiplier=2, min=2, max=30))
 def fetch_series(dataflow, key, start_period, indicator):
     "DOWNLOAD A ECB SERIES FROM THE ECB API AND RETURN IT AS A PANDAS DATAFRAME"
     url = f"{BASE_URL}/{dataflow}/{key}"
